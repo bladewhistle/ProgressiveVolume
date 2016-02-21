@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(HORUS_INTER)\include\vtk-5.10;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>vtkzlib.lib;vtkexpat.lib;vtkjpeg.lib;vtkverdict.lib;vtkpng.lib;vtkDICOMParser.lib;vtksys.lib;LSDyna.lib;vtkfreetype.lib;vtklibxml2.lib;vtkalglib.lib;mpistubs.lib;vtkftgl.lib;MapReduceMPI.lib;vtkproj4.lib;vtkmetaio.lib;vtkCommon.lib;vtksqlite.lib;vtktiff.lib;vtkhdf5.lib;vtkhdf5_hl.lib;vtkNetCDF.lib;vtkNetCDF_cxx.lib;vtkexoIIc.lib;vtkFiltering.lib;vtkImaging.lib;vtkIO.lib;vtkGraphics.lib;vtkGenericFiltering.lib;vtkRendering.lib;vtkVolumeRendering.lib;vtkHybrid.lib;vtkWidgets.lib;vtkInfovis.lib;vtkViews.lib;vtkGeovis.lib;vtkCharts.lib;QVTK.lib;opengl32.lib;d3d9.lib;wbemuuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(HORUS_INTER)/lib/Release/vtk-5.10;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>
