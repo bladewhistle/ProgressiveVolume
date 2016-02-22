@@ -81,7 +81,8 @@ void ProgressiveEngine::startStep(unsigned int step)
     StepInfo& stepInfo = _stepsInfo[_currentStep];
     for(int i = 0; i < _sliceNum; i += stepInfo.sliceThickness) {
         SliceInfo& sliceInfo = _slicesInfo[i];
-        if(sliceInfo.allData.GetPointer() == NULL) {
+        vtkImageData* data = stepInfo.useSmall ? sliceInfo.smallData : sliceInfo.allData;
+        if(data == NULL) {
             _fetchIOThread.startFetch(i, stepInfo.useSmall);
             //qDebug() << "start fetch slice" << i;
         }
@@ -103,10 +104,13 @@ void ProgressiveEngine::onDataReady(unsigned int slice, vtkImageData* data, bool
     count++;
 
     qDebug() << "slice fetch complete" << slice << "with request spacing " << _stepsInfo[_currentStep].sliceThickness;
-    _slicesInfo[slice].allData = data;
+    if(small)
+        _slicesInfo[slice].smallData = data;
+    else
+        _slicesInfo[slice].allData = data;
 
     int all, complete;
-    getImagesProgressForCurrentStep(all, complete);
+    getImagesProgressForCurrentStep(all, complete, small);
     _widget->setProgress(QString("Step %1: %2/%3").arg(_currentStep + 1).arg(complete).arg(all));
     if(_progressive) {
         if(resampleReadyForCurrentStep()) {
@@ -192,30 +196,31 @@ void ProgressiveEngine::generateData(bool skipData)
     //}
 
     for(int i = 0; i < _sliceNum; i+=_stepsInfo[_currentStep].sliceThickness) {
-        if(_slicesInfo[i].allData.GetPointer())
-            DataBuildTheard::insertCTData(_slicesInfo[i].allData, _widget->getInput(), (_sliceNum - i) / _stepsInfo[_currentStep].sliceThickness - 1);
+        vtkImageData* data = _stepsInfo[_currentStep].useSmall ? _slicesInfo[i].smallData : _slicesInfo[i].allData;
+        if(data != NULL)
+            DataBuildTheard::insertCTData(data, _widget->getInput(), (_sliceNum - i) / _stepsInfo[_currentStep].sliceThickness - 1);
     }
 }
 
 void ProgressiveEngine::onAllDataReady(vtkImageData* data)
 {
-    static bool inited = false;
-    if(!inited) {
-        short* ptDSrcData = (short*)data->GetScalarPointer();
-        //*++ptDSrcData = -2048;
-        //*++ptDSrcData = 5680;
-        _widget->initialize(data);
-        _widget->setBlendTypeToBone();
-        _widget->setCameraToBack();
-        inited = true;
-    } else {
-        _widget->setInput(data);
-        data->Modified();
-        //data->Update();
-    }
+    //static bool inited = false;
+    //if(!inited) {
+    //    short* ptDSrcData = (short*)data->GetScalarPointer();
+    //    //*++ptDSrcData = -2048;
+    //    //*++ptDSrcData = 5680;
+    //    _widget->initialize(data);
+    //    _widget->setBlendTypeToBone();
+    //    _widget->setCameraToBack();
+    //    inited = true;
+    //} else {
+    //    _widget->setInput(data);
+    //    data->Modified();
+    //    //data->Update();
+    //}
 
-    _widget->render();
-    //data->Modified();
+    //_widget->render();
+    ////data->Modified();
 }
 
 void ProgressiveEngine::onResampleDataReady(vtkImageData* data)
@@ -237,8 +242,9 @@ void ProgressiveEngine::onResampleDataReady(vtkImageData* data)
 
     qDebug() << "\n current resample spacing " << spacing[2];
     for(int i = 0; i < _sliceNum; i += spacing[2]) {
-        if(_slicesInfo[i].allData.GetPointer())
-            DataBuildTheard::insertCTData(_slicesInfo[i].allData, _widget->getInput(), (_sliceNum - i) / spacing[2] - 1);
+        vtkImageData* data = _stepsInfo[_currentStep].useSmall ? _slicesInfo[i].smallData : _slicesInfo[i].allData;
+        if(data != NULL)
+            DataBuildTheard::insertCTData(data, _widget->getInput(), (_sliceNum - i) / spacing[2] - 1);
     }
 
     _widget->setState("");
@@ -248,13 +254,14 @@ void ProgressiveEngine::onResampleDataReady(vtkImageData* data)
     _widget->render();
 }
 
-void ProgressiveEngine::getImagesProgressForCurrentStep(int& all, int& complete)
+void ProgressiveEngine::getImagesProgressForCurrentStep(int& all, int& complete, bool small)
 {
     all = 0;
     complete = 0;
     for(int i = 0; i < _sliceNum; i+=_stepsInfo[_currentStep].sliceThickness) {
         all++;
-        if(_slicesInfo[i].allData.GetPointer() != NULL)
+        vtkImageData* data = small ? _slicesInfo[i].smallData : _slicesInfo[i].allData;
+        if(data != NULL)
             complete ++;
     }
 }

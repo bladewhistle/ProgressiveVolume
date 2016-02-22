@@ -10,7 +10,7 @@
 
 
 struct SliceInfo {
-    //vtkImageData* smallData;
+    vtkSmartPointer<vtkImageData> smallData;
     vtkSmartPointer<vtkImageData> allData;
 };
 
@@ -55,7 +55,7 @@ protected:
     void startStep(unsigned int step);
     vtkImageData* createData();
 
-    void getImagesProgressForCurrentStep(int& all, int& complete);
+    void getImagesProgressForCurrentStep(int& all, int& complete, bool small);
     bool resampleReadyForCurrentStep();
     void generateData(bool skipData = false);
 

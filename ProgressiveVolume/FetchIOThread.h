@@ -6,6 +6,12 @@
 #include <QMutex>
 #include <vtkSmartPointer.h>
 
+typedef struct {
+    unsigned int slice;
+    bool small;
+} SliceFetchInfo;
+
+
 class vtkImageData;
 
 class FetchIOThread : public QThread
@@ -22,7 +28,7 @@ public:
 signals:
     void dataReady(unsigned int slice, vtkImageData* data, bool small);
 private:
-    QList<unsigned int> _sliceList;
+    QList<SliceFetchInfo> _sliceList;
     QMutex _mutex;
     bool _stopThread;
 };
