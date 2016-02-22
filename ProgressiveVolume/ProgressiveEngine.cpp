@@ -77,6 +77,7 @@ void ProgressiveEngine::startStep(unsigned int step)
     qDebug() << "\n start step " << step << "\n";
     _currentStepDataMap.clear();
 
+    time.start();
     _currentStep = step;
     StepInfo& stepInfo = _stepsInfo[_currentStep];
     for(int i = 0; i < _sliceNum; i += stepInfo.sliceThickness) {
@@ -129,8 +130,15 @@ void ProgressiveEngine::onDataReady(unsigned int slice, vtkImageData* data, bool
         if(!_progressive) {
             generateData();
             _widget->getInput()->Modified();
+
+            int costTime = time.elapsed();
+            float costSecond = costTime / 1000.0;
+            _widget->setState(QString("%1 seconds").arg(QString::number(costSecond, 'f', 1)));
             //_widget->setBlendTypeToBone();
             _widget->render();
+            QPixmap pixmap(_widget->size());
+            ((QWidget*)_widget->parent())->render(&pixmap);
+            pixmap.save(QString("%1.png").arg(_currentStep), "PNG");
 
             if(_currentStep < _stepsInfo.count() - 1)
                 startStep(++_currentStep);

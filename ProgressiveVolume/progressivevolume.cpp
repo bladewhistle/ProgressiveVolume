@@ -19,7 +19,7 @@ ProgressiveVolume::ProgressiveVolume(QWidget *parent, Qt::WFlags flags)
     //prepareData();
     _engine.setWidget(_volumeWidget);
     _engine.setSliceNum(320);
-    _engine.setProgressive(true);
+    _engine.setProgressive(false);
     _engine.prepare();
     _engine.start();
 

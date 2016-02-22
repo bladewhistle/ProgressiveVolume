@@ -4,10 +4,11 @@
 #include <QObject>
 #include <QtCore>
 #include "FetchIOThread.h"
+#include "DownloadIOThread.h"
 #include "ResampleThread.h"
 #include "DataBuildTheard.h"
 #include <vtkImageData.h>
-
+#include <qdatetime.h>
 
 struct SliceInfo {
     vtkSmartPointer<vtkImageData> smallData;
@@ -65,10 +66,11 @@ protected:
     QMap<unsigned int,  vtkSmartPointer<vtkImageData> > _currentStepDataMap;
     unsigned int _currentStep;
     unsigned int _sliceNum;
-    FetchIOThread _fetchIOThread;
+    DownloadIOThread _fetchIOThread;
     ResampleThread _resampleThread;
     VolumeRaycastingWidget* _widget;
     bool _progressive;
+    QTime time;
 };
 
 #endif // PROGRESSIVEENGINE_H
