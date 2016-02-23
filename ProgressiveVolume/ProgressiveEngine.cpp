@@ -44,6 +44,14 @@ void ProgressiveEngine::prepare()
     step.useSmall = true;
     _stepsInfo.append(step);
 
+    step.sliceThickness = 4;
+    step.useSmall = false;
+    _stepsInfo.append(step);
+
+    step.sliceThickness = 2;
+    step.useSmall = true;
+    _stepsInfo.append(step);
+
     step.sliceThickness = 2;
     step.useSmall = false;
     _stepsInfo.append(step);
@@ -112,7 +120,12 @@ void ProgressiveEngine::onDataReady(unsigned int slice, vtkImageData* data, bool
 
     int all, complete;
     getImagesProgressForCurrentStep(all, complete, small);
-    _widget->setProgress(QString("Step %1: %2/%3").arg(_currentStep + 1).arg(complete).arg(all));
+    QString desc;
+    if(_stepsInfo[_currentStep].useSmall)
+        desc = "256x256 8bit";
+    else
+        desc = "512x512 16bit";
+    _widget->setProgress(QString("%1: %2/%3").arg(desc).arg(complete).arg(all));
     if(_progressive) {
         if(resampleReadyForCurrentStep()) {
             DataBuildTheard::insertCTData(data, _widget->getInput(), (_sliceNum - slice) / _stepsInfo[_currentStep].sliceThickness - 1);
